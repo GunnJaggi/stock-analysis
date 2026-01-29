@@ -1,0 +1,637 @@
+Stock portfolio analyzer · HTML
+Copy
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Portfolio Analyzer - Gunn Jaggi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-bg: #ffffff;
+            --color-text: #000000;
+            --color-text-muted: #666666;
+            --color-accent: #0066ff;
+            --color-border: #e5e5e5;
+            --color-section-bg: #fafafa;
+            --color-success: #4caf50;
+            --color-danger: #f44336;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--color-border);
+            z-index: 1000;
+            padding: 1.5rem 0;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--color-text);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
+
+        .back-link {
+            color: var(--color-text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--color-accent);
+            transform: translateX(-4px);
+        }
+
+        .back-link::before {
+            content: '← ';
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 50vh;
+            display: flex;
+            align-items: center;
+            padding-top: 80px;
+            background: var(--color-text);
+            color: white;
+        }
+
+        .hero-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 6rem 3rem;
+            width: 100%;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.03em;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #999;
+            max-width: 700px;
+            line-height: 1.6;
+        }
+
+        /* Main Content */
+        .content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 5rem 3rem;
+        }
+
+        .section {
+            background: white;
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 3rem;
+            margin-bottom: 2.5rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            letter-spacing: -0.02em;
+        }
+
+        .stock-input-area {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            padding: 1rem 1.2rem;
+            border: 2px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            background: var(--color-section-bg);
+            color: var(--color-text);
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--color-text);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-accent);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--color-danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #d32f2f;
+        }
+
+        .portfolio-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+        }
+
+        .portfolio-table th,
+        .portfolio-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .portfolio-table th {
+            font-weight: 700;
+            background: var(--color-section-bg);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .portfolio-table td {
+            font-weight: 500;
+        }
+
+        .positive {
+            color: var(--color-success);
+        }
+
+        .negative {
+            color: var(--color-danger);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .metric-card {
+            background: var(--color-section-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--color-border);
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            border-color: var(--color-accent);
+            transform: translateY(-2px);
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .chart-container {
+            margin-top: 2rem;
+            height: 300px;
+            position: relative;
+        }
+
+        canvas {
+            max-width: 100%;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--color-text);
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+            margin-top: 5rem;
+        }
+
+        footer p {
+            color: #999;
+            font-size: 0.95rem;
+        }
+
+        /* Gradient animation */
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hero {
+            background: linear-gradient(-45deg, #000000, #1a1a1a, #000000, #0a0a0a);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .stock-input-area {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-container,
+            .content,
+            .hero-container {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .content {
+                padding: 3rem 1.5rem;
+            }
+
+            .section {
+                padding: 2rem;
+            }
+
+            .portfolio-table {
+                font-size: 0.85rem;
+            }
+
+            .portfolio-table th,
+            .portfolio-table td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="https://gunnjaggi.github.io/GunnJaggi/index.html" class="logo">Gunn Jaggi</a>
+            <a href="https://gunnjaggi.github.io/GunnJaggi/index.html#projects" class="back-link">Back to Projects</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <h1>Stock Portfolio Analyzer</h1>
+            <p>
+                Track your stock investments, calculate portfolio metrics, and visualize performance. 
+                Built with vanilla JavaScript - no external APIs required for demo purposes.
+            </p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="content">
+        <!-- Add Stock Section -->
+        <div class="section">
+            <h2>Add Stock to Portfolio</h2>
+            <div class="stock-input-area">
+                <input type="text" id="stockSymbol" placeholder="Stock Symbol (e.g., AAPL, MSFT)" />
+                <input type="number" id="shares" placeholder="Shares" step="1" min="0" />
+                <input type="number" id="buyPrice" placeholder="Buy Price (₹)" step="0.01" min="0" />
+                <button class="btn btn-primary" onclick="addStock()">Add Stock</button>
+            </div>
+            <p style="color: var(--color-text-muted); font-size: 0.9rem;">
+                Note: This is a demo using simulated data. Current prices are randomly generated for demonstration purposes.
+            </p>
+        </div>
+
+        <!-- Portfolio Table -->
+        <div class="section">
+            <h2>Your Portfolio</h2>
+            <table class="portfolio-table">
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Shares</th>
+                        <th>Buy Price</th>
+                        <th>Current Price</th>
+                        <th>Total Value</th>
+                        <th>Gain/Loss</th>
+                        <th>Return %</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="portfolioBody">
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: var(--color-text-muted);">
+                            No stocks in portfolio. Add stocks above to get started.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Portfolio Metrics -->
+        <div class="section">
+            <h2>Portfolio Metrics</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Total Investment</div>
+                    <div class="metric-value" id="totalInvestment">₹0.00</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Current Value</div>
+                    <div class="metric-value" id="currentValue">₹0.00</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Total Gain/Loss</div>
+                    <div class="metric-value" id="totalGainLoss">₹0.00</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Portfolio Return</div>
+                    <div class="metric-value" id="portfolioReturn">0.00%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Portfolio Allocation Chart -->
+        <div class="section">
+            <h2>Portfolio Allocation</h2>
+            <div class="chart-container">
+                <canvas id="allocationChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Gunn Jaggi. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let portfolio = [];
+        let chart = null;
+
+        // Simulated current prices (randomly generated for demo)
+        function getSimulatedPrice(buyPrice) {
+            const change = (Math.random() - 0.4) * buyPrice * 0.2; // -40% to +60% change
+            return Math.max(buyPrice + change, buyPrice * 0.1); // Minimum 10% of buy price
+        }
+
+        function addStock() {
+            const symbol = document.getElementById('stockSymbol').value.toUpperCase().trim();
+            const shares = parseFloat(document.getElementById('shares').value);
+            const buyPrice = parseFloat(document.getElementById('buyPrice').value);
+
+            if (!symbol || !shares || !buyPrice || shares <= 0 || buyPrice <= 0) {
+                alert('Please enter valid stock information');
+                return;
+            }
+
+            const currentPrice = getSimulatedPrice(buyPrice);
+            
+            portfolio.push({
+                symbol,
+                shares,
+                buyPrice,
+                currentPrice
+            });
+
+            // Clear inputs
+            document.getElementById('stockSymbol').value = '';
+            document.getElementById('shares').value = '';
+            document.getElementById('buyPrice').value = '';
+
+            updatePortfolio();
+        }
+
+        function removeStock(index) {
+            portfolio.splice(index, 1);
+            updatePortfolio();
+        }
+
+        function formatCurrency(value) {
+            return '₹' + value.toFixed(2);
+        }
+
+        function formatPercent(value) {
+            return value.toFixed(2) + '%';
+        }
+
+        function updatePortfolio() {
+            const tbody = document.getElementById('portfolioBody');
+            
+            if (portfolio.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: var(--color-text-muted);">
+                            No stocks in portfolio. Add stocks above to get started.
+                        </td>
+                    </tr>
+                `;
+                updateMetrics();
+                return;
+            }
+
+            let html = '';
+            portfolio.forEach((stock, index) => {
+                const totalCost = stock.shares * stock.buyPrice;
+                const currentValue = stock.shares * stock.currentPrice;
+                const gainLoss = currentValue - totalCost;
+                const returnPct = (gainLoss / totalCost) * 100;
+                const gainLossClass = gainLoss >= 0 ? 'positive' : 'negative';
+
+                html += `
+                    <tr>
+                        <td><strong>${stock.symbol}</strong></td>
+                        <td>${stock.shares}</td>
+                        <td>${formatCurrency(stock.buyPrice)}</td>
+                        <td>${formatCurrency(stock.currentPrice)}</td>
+                        <td>${formatCurrency(currentValue)}</td>
+                        <td class="${gainLossClass}">${formatCurrency(gainLoss)}</td>
+                        <td class="${gainLossClass}">${formatPercent(returnPct)}</td>
+                        <td><button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="removeStock(${index})">Remove</button></td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+            updateMetrics();
+            updateChart();
+        }
+
+        function updateMetrics() {
+            let totalInvestment = 0;
+            let currentValue = 0;
+
+            portfolio.forEach(stock => {
+                totalInvestment += stock.shares * stock.buyPrice;
+                currentValue += stock.shares * stock.currentPrice;
+            });
+
+            const totalGainLoss = currentValue - totalInvestment;
+            const portfolioReturn = totalInvestment > 0 ? (totalGainLoss / totalInvestment) * 100 : 0;
+
+            document.getElementById('totalInvestment').textContent = formatCurrency(totalInvestment);
+            document.getElementById('currentValue').textContent = formatCurrency(currentValue);
+            
+            const gainLossEl = document.getElementById('totalGainLoss');
+            gainLossEl.textContent = formatCurrency(totalGainLoss);
+            gainLossEl.className = 'metric-value ' + (totalGainLoss >= 0 ? 'positive' : 'negative');
+
+            const returnEl = document.getElementById('portfolioReturn');
+            returnEl.textContent = formatPercent(portfolioReturn);
+            returnEl.className = 'metric-value ' + (portfolioReturn >= 0 ? 'positive' : 'negative');
+        }
+
+        function updateChart() {
+            const ctx = document.getElementById('allocationChart');
+            
+            if (portfolio.length === 0) {
+                if (chart) {
+                    chart.destroy();
+                    chart = null;
+                }
+                return;
+            }
+
+            const labels = portfolio.map(s => s.symbol);
+            const data = portfolio.map(s => s.shares * s.currentPrice);
+            const colors = [
+                '#0066ff', '#00c853', '#ff6d00', '#d500f9', 
+                '#00b8d4', '#ffd600', '#ff1744', '#76ff03'
+            ];
+
+            if (chart) {
+                chart.destroy();
+            }
+
+            chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors.slice(0, portfolio.length),
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    size: 14,
+                                    family: 'Inter'
+                                },
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${context.label}: ${formatCurrency(value)} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Navbar shadow on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
+            } else {
+                nav.style.boxShadow = 'none';
+            }
+        });
+
+        // Initialize
+        updatePortfolio();
+    </script>
+</body>
+</html>
