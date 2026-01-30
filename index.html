@@ -47,12 +47,20 @@
             padding: 3rem 2rem;
         }
 
-        .section {
-            border: 1px solid #e5e5e5;
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
+       .section {
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 2rem;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+
+    max-width: 700px;
+    margin: 40px auto;
+}
+
 
         input, button {
             padding: 1rem;
@@ -134,8 +142,9 @@ async function analyzeStock() {
 
     try {
         const res = await fetch(
-            `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=1mo&interval=1d`
-        );
+    `https://corsproxy.io/?https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=1mo&interval=1d`
+);
+
         const json = await res.json();
         const result = json.chart.result[0];
 
