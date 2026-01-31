@@ -3,201 +3,685 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Analysis Dashboard - Gunn Jaggi</title>
-
+    <title>Stock Analysis - Gunn Jaggi</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <style>
+        :root {
+            --color-bg: #ffffff;
+            --color-text: #000000;
+            --color-text-muted: #666666;
+            --color-accent: #0066ff;
+            --color-border: #e5e5e5;
+            --color-section-bg: #fafafa;
+            --color-success: #4caf50;
+            --color-danger: #f44336;
+            --color-warning: #ff9800;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            margin: 0;
             font-family: 'Inter', sans-serif;
-            background: #fff;
-            color: #000;
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
         }
 
+        /* Nav */
         nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
+            position: fixed; top: 0; left: 0; right: 0;
             background: rgba(255,255,255,0.95);
-            border-bottom: 1px solid #e5e5e5;
-            padding: 1rem 2rem;
-            z-index: 1000;
-            display: flex;
-            justify-content: space-between;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--color-border);
+            z-index: 1000; padding: 1.5rem 0;
         }
-
-        nav a {
-            text-decoration: none;
-            color: #000;
-            font-weight: 600;
+        .nav-container {
+            max-width: 1400px; margin: 0 auto; padding: 0 3rem;
+            display: flex; justify-content: space-between; align-items: center;
         }
+        .logo { font-size: 1.1rem; font-weight: 700; color: var(--color-text); text-decoration: none; }
+        .back-link { color: var(--color-text-muted); text-decoration: none; font-weight: 500; font-size: 0.95rem; transition: color 0.3s; }
+        .back-link:hover { color: var(--color-accent); }
+        .back-link::before { content: '← '; }
 
+        /* Hero */
         .hero {
-            margin-top: 80px;
-            padding: 5rem 2rem;
-            background: linear-gradient(-45deg, #000, #1a1a1a);
+            min-height: 50vh; display: flex; align-items: center; padding-top: 80px;
+            background: linear-gradient(-45deg, #000, #1a1a1a, #000, #0a0a0a);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
             color: white;
         }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .hero-container { max-width: 1400px; margin: 0 auto; padding: 6rem 3rem; width: 100%; }
+        .hero h1 { font-size: 4rem; font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -0.03em; }
+        .hero p { font-size: 1.2rem; color: #999; max-width: 700px; }
 
-        .content {
-            max-width: 1200px;
-            margin: auto;
-            padding: 3rem 2rem;
+        /* Content */
+        .content { max-width: 1400px; margin: 0 auto; padding: 5rem 3rem; }
+
+        .section {
+            background: white; border: 1px solid var(--color-border);
+            border-radius: 12px; padding: 3rem; margin-bottom: 2.5rem;
+        }
+        h2 { font-size: 2rem; font-weight: 700; margin-bottom: 2rem; letter-spacing: -0.02em; }
+
+        /* Search */
+        .search-bar { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+
+        input[type="text"] {
+            flex: 1; padding: 1rem 1.2rem;
+            border: 2px solid var(--color-border); border-radius: 8px;
+            font-size: 1rem; font-family: inherit;
+            background: var(--color-section-bg); font-weight: 500;
+            transition: all 0.2s;
+        }
+        input:focus { outline: none; border-color: var(--color-accent); background: white; box-shadow: 0 0 0 3px rgba(0,102,255,0.1); }
+
+        .btn {
+            padding: 1rem 2rem; border: none; border-radius: 8px;
+            font-weight: 700; cursor: pointer; font-family: inherit;
+            font-size: 1rem; transition: all 0.3s;
+        }
+        .btn-primary { background: var(--color-text); color: white; }
+        .btn-primary:hover { background: var(--color-accent); transform: translateY(-2px); }
+        .btn-primary:disabled { background: #999; cursor: not-allowed; transform: none; }
+
+        .quick-btns { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 1rem; }
+        .quick-btn {
+            padding: 0.5rem 1rem; border: 1px solid var(--color-border);
+            border-radius: 6px; background: var(--color-section-bg);
+            font-family: inherit; font-weight: 600; font-size: 0.85rem;
+            cursor: pointer; transition: all 0.2s; color: var(--color-text);
+        }
+        .quick-btn:hover { border-color: var(--color-accent); color: var(--color-accent); }
+
+        /* Loading */
+        .loading { text-align: center; padding: 3rem; color: var(--color-text-muted); }
+        .spinner {
+            border: 3px solid var(--color-border); border-top: 3px solid var(--color-accent);
+            border-radius: 50%; width: 40px; height: 40px;
+            animation: spin 0.8s linear infinite; margin: 0 auto 1rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Stock Header */
+        .stock-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 2rem; padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+        .stock-symbol { font-size: 2.8rem; font-weight: 800; letter-spacing: -0.02em; }
+        .stock-name { color: var(--color-text-muted); font-size: 1.1rem; margin-top: 0.3rem; }
+        .price-block { text-align: right; }
+        .stock-price { font-size: 3rem; font-weight: 800; letter-spacing: -0.02em; }
+        .stock-change { font-size: 1.1rem; font-weight: 700; margin-top: 0.3rem; }
+
+        .positive { color: var(--color-success); }
+        .negative { color: var(--color-danger); }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.2rem;
+        }
+        .metric-card {
+            background: var(--color-section-bg); padding: 1.5rem;
+            border-radius: 10px; border: 1px solid var(--color-border);
+            transition: all 0.3s;
+        }
+        .metric-card:hover { border-color: var(--color-accent); transform: translateY(-2px); }
+        .metric-label {
+            font-size: 0.78rem; color: var(--color-text-muted);
+            font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+        .metric-value { font-size: 1.4rem; font-weight: 800; }
+        .metric-sub { font-size: 0.78rem; color: var(--color-text-muted); margin-top: 0.25rem; }
+
+        /* Chart */
+        .chart-container { height: 360px; margin-top: 1rem; }
+        canvas { max-width: 100%; }
+
+        .chart-toggle { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+        .chart-btn {
+            padding: 0.5rem 1.2rem; border: 1px solid var(--color-border);
+            border-radius: 6px; background: white; font-family: inherit;
+            font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+        }
+        .chart-btn.active { background: var(--color-text); color: white; border-color: var(--color-text); }
+        .chart-btn:hover:not(.active) { border-color: var(--color-accent); color: var(--color-accent); }
+
+        /* Signal Box */
+        .signal-box {
+            border-radius: 12px; padding: 2rem; margin-top: 2rem;
+            border: 2px solid;
+        }
+        .signal-box.buy { background: #e8f5e9; border-color: var(--color-success); }
+        .signal-box.sell { background: #ffebee; border-color: var(--color-danger); }
+        .signal-box.hold { background: #fff3e0; border-color: var(--color-warning); }
+
+        .signal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .signal-title { font-size: 1.4rem; font-weight: 800; }
+        .signal-confidence {
+            padding: 0.4rem 1rem; border-radius: 6px;
+            font-weight: 700; font-size: 0.85rem; background: rgba(0,0,0,0.08);
+        }
+        .signal-reasons { list-style: none; }
+        .signal-reasons li {
+            padding: 0.6rem 0; border-bottom: 1px solid rgba(0,0,0,0.06);
+            font-size: 0.95rem; padding-left: 1.5rem; position: relative;
+        }
+        .signal-reasons li:last-child { border-bottom: none; }
+        .signal-reasons li::before { content: '›'; position: absolute; left: 0; font-weight: 800; font-size: 1.2rem; }
+
+        /* Error / Info */
+        .info-note {
+            background: #fff3e0; border-left: 4px solid var(--color-warning);
+            padding: 1rem 1.2rem; border-radius: 0 6px 6px 0;
+            font-size: 0.9rem; color: #e65100; margin-top: 1rem;
+        }
+        .error-note {
+            background: #ffebee; border: 1px solid var(--color-danger);
+            padding: 1rem 1.2rem; border-radius: 8px;
+            color: var(--color-danger); font-size: 0.95rem;
         }
 
-       .section {
-    border: 1px solid #e5e5e5;
-    border-radius: 12px;
-    padding: 2rem;
+        /* Footer */
+        footer { background: #000; color: white; padding: 3rem 0; text-align: center; margin-top: 3rem; }
+        footer p { color: #999; font-size: 0.9rem; }
+        footer .source { margin-top: 0.5rem; font-size: 0.8rem; color: #666; }
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-
-    max-width: 700px;
-    margin: 40px auto;
-}
-
-
-        input, button {
-            padding: 1rem;
-            font-size: 1rem;
-        }
-
-        button {
-            cursor: pointer;
-            background: #000;
-            color: white;
-            border: none;
-            border-radius: 6px;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .metric {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        canvas {
-            max-width: 100%;
-            height: 400px;
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .content { padding: 3rem 1.5rem; }
+            .section { padding: 2rem; }
+            .stock-header { flex-direction: column; gap: 0.5rem; }
+            .price-block { text-align: left; }
+            .search-bar { flex-direction: column; }
+            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
-
 <body>
 
 <nav>
-    <a href="https://gunnjaggi.github.io/GunnJaggi/index.html">Gunn Jaggi</a>
-    <a href="https://gunnjaggi.github.io/GunnJaggi/index.html#projects">Back to Projects</a>
+    <div class="nav-container">
+        <a href="https://gunnjaggi.github.io/GunnJaggi/index.html" class="logo">Gunn Jaggi</a>
+        <a href="https://gunnjaggi.github.io/GunnJaggi/index.html#projects" class="back-link">Back to Projects</a>
+    </div>
 </nav>
 
 <section class="hero">
-    <h1>Stock Analysis Dashboard</h1>
-    <p>Real-time stock prices and technical analysis using Yahoo Finance data.</p>
+    <div class="hero-container">
+        <h1>Stock Analysis</h1>
+        <p>
+            Pull real stock data directly from Yahoo Finance — the same source as the Python yfinance library. 
+            Get live prices, beta, P/E, market cap, technical indicators, and buy/sell signals.
+        </p>
+    </div>
 </section>
 
 <div class="content">
 
+    <!-- Search -->
     <div class="section">
-        <input id="stockSymbol" placeholder="Enter stock symbol (AAPL, TSLA, NVDA)" />
-        <button onclick="analyzeStock()">Analyze</button>
-    </div>
-
-    <div id="loading" class="section hidden">
-        Loading real stock data...
-    </div>
-
-    <div id="results" class="hidden">
-
-        <div class="section">
-            <h2 id="symbolTitle"></h2>
-            <div class="metric" id="price"></div>
-            <div id="change"></div>
+        <h2>Search a Stock</h2>
+        <div class="search-bar">
+            <input type="text" id="stockInput" placeholder="e.g. AAPL, MSFT, GOOGL, TSLA, NVDA" />
+            <button class="btn btn-primary" id="searchBtn" onclick="run()">Analyze</button>
         </div>
-
-        <div class="section">
-            <canvas id="chart"></canvas>
+        <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 0.6rem;">
+            Works with <strong>any</strong> stock listed on Yahoo Finance — type any US ticker above, or quick-select below:
+        </p>
+        <div class="quick-btns">
+            <span style="font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px; width: 100%; margin-bottom: 0.2rem;">Tech</span>
+            <button class="quick-btn" onclick="quickSearch('AAPL')">AAPL</button>
+            <button class="quick-btn" onclick="quickSearch('MSFT')">MSFT</button>
+            <button class="quick-btn" onclick="quickSearch('GOOGL')">GOOGL</button>
+            <button class="quick-btn" onclick="quickSearch('NVDA')">NVDA</button>
+            <button class="quick-btn" onclick="quickSearch('META')">META</button>
+            <button class="quick-btn" onclick="quickSearch('AMZN')">AMZN</button>
+            <span style="font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px; width: 100%; margin-top: 0.4rem; margin-bottom: 0.2rem;">EV / Auto</span>
+            <button class="quick-btn" onclick="quickSearch('TSLA')">TSLA</button>
+            <button class="quick-btn" onclick="quickSearch('F')">F</button>
+            <button class="quick-btn" onclick="quickSearch('GM')">GM</button>
+            <button class="quick-btn" onclick="quickSearch('RIVN')">RIVN</button>
+            <span style="font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px; width: 100%; margin-top: 0.4rem; margin-bottom: 0.2rem;">Finance / Banking</span>
+            <button class="quick-btn" onclick="quickSearch('JPM')">JPM</button>
+            <button class="quick-btn" onclick="quickSearch('GS')">GS</button>
+            <button class="quick-btn" onclick="quickSearch('BAC')">BAC</button>
+            <button class="quick-btn" onclick="quickSearch('V')">V</button>
+            <span style="font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px; width: 100%; margin-top: 0.4rem; margin-bottom: 0.2rem;">Energy / Healthcare</span>
+            <button class="quick-btn" onclick="quickSearch('XOM')">XOM</button>
+            <button class="quick-btn" onclick="quickSearch('JNJ')">JNJ</button>
+            <button class="quick-btn" onclick="quickSearch('PFE')">PFE</button>
+            <button class="quick-btn" onclick="quickSearch('UNH')">UNH</button>
         </div>
-
     </div>
+
+    <!-- Output area -->
+    <div id="output"></div>
 
 </div>
 
+<footer>
+    
+    <p class="source">Real-time data sourced from Yahoo Finance</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-let chart;
+// ─── CONFIG ───────────────────────────────────────────────────
+// Yahoo Finance blocks direct browser fetch() due to CORS.
+// Solution: route through a CORS proxy. This is standard practice —
+// the proxy just forwards the request and adds the Access-Control header.
+// Multiple proxies listed so if one is down we fall through to the next.
+const PROXIES = [
+    'https://corsproxy.io/?',
+    'https://api.allorigins.win/raw?url=',
+    'https://corsproxy.org/?'
+];
 
-async function analyzeStock() {
-    const symbol = document.getElementById("stockSymbol").value.toUpperCase();
-    if (!symbol) return alert("Enter a symbol");
+function yfQuoteURL(sym)                { return `https://query1.finance.yahoo.com/v6/finance/quote?symbols=${sym}`; }
+function yfSparkURL(sym, range, intv)   { return `https://query1.finance.yahoo.com/v7/finance/spark?symbols=${sym}&range=${range}&interval=${intv}`; }
 
-    document.getElementById("loading").classList.remove("hidden");
-    document.getElementById("results").classList.add("hidden");
+let chartInstance = null;
+let sparkCache = {};
+
+// ── Fetch with proxy fallback ─────────────────────────────────
+// Tries each proxy in order. If one fails (network error, 403, timeout)
+// it moves to the next. Only throws if ALL proxies fail.
+async function proxyFetch(yahooURL) {
+    let lastErr;
+    for (const proxy of PROXIES) {
+        try {
+            const res = await fetch(proxy + encodeURIComponent(yahooURL), { signal: AbortSignal.timeout(8000) });
+            if (!res.ok) { lastErr = new Error(`Proxy returned ${res.status}`); continue; }
+            return await res.json();
+        } catch (e) {
+            lastErr = e;
+        }
+    }
+    throw lastErr || new Error('All proxies failed');
+}
+
+// ─── ENTRY ────────────────────────────────────────────────────
+function quickSearch(sym) {
+    document.getElementById('stockInput').value = sym;
+    run();
+}
+
+async function run() {
+    const sym = document.getElementById('stockInput').value.trim().toUpperCase();
+    if (!sym) return;
+
+    document.getElementById('searchBtn').disabled = true;
+    sparkCache = {};
+    setOutput(`<div class="section"><div class="loading"><div class="spinner"></div>Fetching live data from Yahoo Finance…</div></div>`);
 
     try {
-        const res = await fetch(
-    `https://corsproxy.io/?https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=1mo&interval=1d`
-);
+        // ── 1. Fetch quote + spark in parallel through proxy ──
+        const [quoteJson, sparkJson] = await Promise.all([
+            proxyFetch(yfQuoteURL(sym)),
+            proxyFetch(yfSparkURL(sym, '1mo', '1d'))
+        ]);
 
-        const json = await res.json();
-        const result = json.chart.result[0];
+        // ── 2. Validate quote ──
+        const result = quoteJson?.quoteResponse?.result?.[0];
+        if (!result || !result.regularMarketPrice) {
+            throw new Error(`"${sym}" not found. Check the symbol and try again (e.g. AAPL, MSFT, GOOGL).`);
+        }
 
-        const prices = result.indicators.quote[0].close.filter(x => x !== null);
-        const timestamps = result.timestamp.slice(-prices.length);
+        // ── 3. Validate spark / historical prices ──
+        const sparkResult = sparkJson?.sparkResponse?.result?.[0];
+        const closePrices = sparkResult?.response?.[0]?.indicators?.quote?.[0]?.close || [];
+        const timestamps  = sparkResult?.response?.[0]?.timestamp || [];
 
-        const dates = timestamps.map(t =>
-            new Date(t * 1000).toISOString().split("T")[0]
-        );
+        if (closePrices.length < 5) throw new Error('Not enough historical data for this symbol.');
 
-        const current = prices[prices.length - 1];
-        const prev = prices[prices.length - 2];
-        const change = current - prev;
-        const pct = (change / prev) * 100;
+        // ── 4. Cache and render ──
+        sparkCache['1mo'] = { closePrices, timestamps };
+        render(sym, result, closePrices, timestamps, '1mo');
 
-        document.getElementById("symbolTitle").innerText = symbol;
-        document.getElementById("price").innerText = `$${current.toFixed(2)}`;
-        document.getElementById("change").innerText =
-            `${change >= 0 ? "+" : ""}${change.toFixed(2)} (${pct.toFixed(2)}%)`;
-
-        drawChart(dates, prices);
-
-        document.getElementById("loading").classList.add("hidden");
-        document.getElementById("results").classList.remove("hidden");
-
-    } catch (e) {
-        alert("Failed to load stock data");
+    } catch (err) {
+        setOutput(`<div class="section"><div class="error-note">
+            <strong>Could not fetch data.</strong><br><br>
+            ${err.message}<br><br>
+            <strong>Things to try:</strong><br>
+            1. Make sure you're viewing this on <strong>GitHub Pages</strong> (not opening the HTML file locally from your desktop).<br>
+            2. Disable any ad blocker or browser extension that blocks third-party requests.<br>
+            3. Try a different browser (Chrome works best).<br>
+            4. Wait 10 seconds and search again — Yahoo occasionally rate-limits.
+        </div></div>`);
+    } finally {
+        document.getElementById('searchBtn').disabled = false;
     }
 }
 
-function drawChart(labels, data) {
-    const ctx = document.getElementById("chart");
+// ─── RENDER ───────────────────────────────────────────────────
+function render(sym, q, closes, timestamps, activeRange) {
+    // Extract values with safe fallbacks
+    const price        = q.regularMarketPrice;
+    const change       = q.regularMarketChange;
+    const changePct    = q.regularMarketChangePercent * 100;
+    const open         = q.regularMarketOpen;
+    const high         = q.regularMarketDayHigh;
+    const low          = q.regularMarketDayLow;
+    const prevClose    = q.regularMarketPreviousClose;
+    const volume       = q.regularMarketVolume;
+    const marketCap    = q.marketCap;
+    const beta         = q.beta;
+    const peRatio      = q.trailingPE;
+    const hi52         = q.fiftyTwoWeekHigh;
+    const lo52         = q.fiftyTwoWeekLow;
+    const name         = q.shortName || q.longName || sym;
+    const exchange     = q.exchangeName || '';
+    const currency     = q.currency || 'USD';
 
-    if (chart) chart.destroy();
+    // Compute technical indicators from closes array
+    const tech = calcTechnicals(closes, price);
+    const signal = computeSignal(price, tech, change);
 
-    chart = new Chart(ctx, {
-        type: "line",
+    const chgClass = change >= 0 ? 'positive' : 'negative';
+    const chgSign  = change >= 0 ? '+' : '';
+
+    const html = `
+    <!-- Header + Price -->
+    <div class="section">
+        <div class="stock-header">
+            <div>
+                <div class="stock-symbol">${sym}</div>
+                <div class="stock-name">${name} · ${exchange}</div>
+            </div>
+            <div class="price-block">
+                <div class="stock-price">${currency === 'USD' ? '$' : currency + ' '}${fmt(price)}</div>
+                <div class="stock-change ${chgClass}">${chgSign}${fmt(change)} (${chgSign}${changePct.toFixed(2)}%)</div>
+            </div>
+        </div>
+
+        <!-- Key Stats -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Open</div>
+                <div class="metric-value">$${fmt(open)}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Day High</div>
+                <div class="metric-value">$${fmt(high)}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Day Low</div>
+                <div class="metric-value">$${fmt(low)}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Prev Close</div>
+                <div class="metric-value">$${fmt(prevClose)}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Volume</div>
+                <div class="metric-value">${fmtVol(volume)}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Market Cap</div>
+                <div class="metric-value">${fmtCap(marketCap)}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Beta</div>
+                <div class="metric-value">${beta != null ? beta.toFixed(2) : 'N/A'}</div>
+                <div class="metric-sub">${beta != null ? (beta > 1 ? 'More volatile than market' : beta < 1 ? 'Less volatile than market' : 'Moves with market') : ''}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">P/E Ratio</div>
+                <div class="metric-value">${peRatio != null ? peRatio.toFixed(1) : 'N/A'}</div>
+                <div class="metric-sub">${peRatio != null ? (peRatio > 30 ? 'Growth-priced' : peRatio < 15 ? 'Value-priced' : 'Fair valued') : ''}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">52-Week High</div>
+                <div class="metric-value">$${fmt(hi52)}</div>
+                <div class="metric-sub">${hi52 ? ((price/hi52)*100).toFixed(1) + '% of high' : ''}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">52-Week Low</div>
+                <div class="metric-value">$${fmt(lo52)}</div>
+                <div class="metric-sub">${lo52 ? (((price-lo52)/lo52)*100).toFixed(1) + '% above low' : ''}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">SMA (20-day)</div>
+                <div class="metric-value">$${fmt(tech.sma20)}</div>
+                <div class="metric-sub ${price > tech.sma20 ? 'positive' : 'negative'}">${price > tech.sma20 ? 'Price above' : 'Price below'}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">RSI (14-day)</div>
+                <div class="metric-value">${tech.rsi.toFixed(1)}</div>
+                <div class="metric-sub ${tech.rsi < 30 ? 'positive' : tech.rsi > 70 ? 'negative' : ''}">${tech.rsi < 30 ? 'Oversold' : tech.rsi > 70 ? 'Overbought' : 'Neutral'}</div>
+            </div>
+        </div>
+
+        <!-- Signal -->
+        <div class="signal-box ${signal.type.toLowerCase()}">
+            <div class="signal-header">
+                <div class="signal-title">${signal.type === 'BUY' ? '📈' : signal.type === 'SELL' ? '📉' : '➡️'} Signal: ${signal.type}</div>
+                <div class="signal-confidence">Confidence: ${signal.confidence}%</div>
+            </div>
+            <ul class="signal-reasons">
+                ${signal.reasons.map(r => `<li>${r}</li>`).join('')}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="section">
+        <h2>Price History</h2>
+        <div class="chart-toggle">
+            <button class="chart-btn ${activeRange === '1mo' ? 'active' : ''}" onclick="switchRange('${sym}','1mo','1d')">1M</button>
+            <button class="chart-btn ${activeRange === '3mo' ? 'active' : ''}" onclick="switchRange('${sym}','3mo','1d')">3M</button>
+            <button class="chart-btn ${activeRange === '6mo' ? 'active' : ''}" onclick="switchRange('${sym}','6mo','1d')">6M</button>
+            <button class="chart-btn ${activeRange === '1y'  ? 'active' : ''}" onclick="switchRange('${sym}','1y','1d')">1Y</button>
+        </div>
+        <div class="chart-container">
+            <canvas id="priceChart"></canvas>
+        </div>
+    </div>
+
+    <div class="info-note">
+        <strong>⚠️ Disclaimer:</strong> This tool is for educational and informational purposes only. 
+        The buy/sell signals are generated from basic technical analysis and should <em>not</em> be used as sole basis for investment decisions. 
+        Always do your own research and consult a financial advisor.
+    </div>`;
+
+    setOutput(html);
+    drawChart(closes, timestamps, sym);
+}
+
+// ─── CHART ────────────────────────────────────────────────────
+function drawChart(closes, timestamps, sym) {
+    if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+
+    const labels = timestamps.map(ts => {
+        const d = new Date(ts * 1000);
+        return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    });
+
+    // Filter out nulls (weekends/holidays)
+    const filtered = closes.map((c, i) => ({ c, l: labels[i] })).filter(x => x.c !== null);
+    const data   = filtered.map(x => x.c);
+    const lbls   = filtered.map(x => x.l);
+
+    const isUp = data[data.length - 1] >= data[0];
+    const borderColor = isUp ? '#4caf50' : '#f44336';
+    const fillColor   = isUp ? 'rgba(76,175,80,0.08)' : 'rgba(244,67,54,0.08)';
+
+    const ctx = document.getElementById('priceChart').getContext('2d');
+    chartInstance = new Chart(ctx, {
+        type: 'line',
         data: {
-            labels,
+            labels: lbls,
             datasets: [{
-                data,
-                borderColor: "#0066ff",
-                fill: false,
-                tension: 0.2
+                label: sym,
+                data: data,
+                borderColor: borderColor,
+                backgroundColor: fillColor,
+                borderWidth: 2,
+                fill: true,
+                tension: 0.2,
+                pointRadius: 0,
+                pointHoverRadius: 4
             }]
         },
         options: {
             responsive: true,
-            plugins: { legend: { display: false } }
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { ticks: { maxTicksLimit: 8, maxRotation: 0 } },
+                y: { beginAtZero: false, ticks: { callback: v => '$' + v.toFixed(0) } }
+            }
         }
     });
 }
-</script>
 
+// Range switcher — fetches new spark data if not cached
+async function switchRange(sym, range, interval) {
+    // Toggle active button
+    document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+
+    if (sparkCache[range]) {
+        drawChart(sparkCache[range].closePrices, sparkCache[range].timestamps, sym);
+        return;
+    }
+
+    try {
+        const json = await proxyFetch(yfSparkURL(sym, range, interval));
+        const sr = json?.sparkResponse?.result?.[0]?.response?.[0];
+        if (!sr) throw new Error('No data');
+        sparkCache[range] = { closePrices: sr.indicators.quote[0].close, timestamps: sr.timestamp };
+        drawChart(sparkCache[range].closePrices, sparkCache[range].timestamps, sym);
+    } catch (e) {
+        alert('Could not load ' + range + ' data. Try again in a moment.');
+    }
+}
+
+// ─── TECHNICAL INDICATORS ─────────────────────────────────────
+function calcTechnicals(closes, currentPrice) {
+    // Filter nulls
+    const prices = closes.filter(c => c !== null);
+
+    // SMA 20
+    const sma20 = prices.length >= 20
+        ? prices.slice(-20).reduce((a,b) => a+b, 0) / 20
+        : prices.reduce((a,b) => a+b, 0) / prices.length;
+
+    // RSI 14
+    let gains = 0, losses = 0;
+    const period = Math.min(14, prices.length - 1);
+    for (let i = prices.length - period; i < prices.length; i++) {
+        const diff = prices[i] - prices[i-1];
+        if (diff > 0) gains += diff; else losses -= diff;
+    }
+    const avgGain = gains / period;
+    const avgLoss = losses / period;
+    const rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
+    const rsi = 100 - (100 / (1 + rs));
+
+    // Momentum (10-day)
+    const momentum = prices.length >= 10
+        ? prices[prices.length-1] - prices[prices.length-10]
+        : 0;
+
+    return { sma20, rsi, momentum };
+}
+
+// ─── SIGNAL LOGIC ─────────────────────────────────────────────
+function computeSignal(price, tech, change) {
+    let buyScore = 0, sellScore = 0;
+    const reasons = [];
+
+    // 1. Price vs SMA20
+    if (price > tech.sma20) {
+        buyScore += 2;
+        reasons.push(`Price ($${fmt(price)}) is above 20-day moving average ($${fmt(tech.sma20)}) — upward trend`);
+    } else {
+        sellScore += 2;
+        reasons.push(`Price ($${fmt(price)}) is below 20-day moving average ($${fmt(tech.sma20)}) — downward trend`);
+    }
+
+    // 2. RSI
+    if (tech.rsi < 30) {
+        buyScore += 3;
+        reasons.push(`RSI at ${tech.rsi.toFixed(1)} — stock is oversold, historically a buying opportunity`);
+    } else if (tech.rsi > 70) {
+        sellScore += 3;
+        reasons.push(`RSI at ${tech.rsi.toFixed(1)} — stock is overbought, may correct soon`);
+    } else {
+        reasons.push(`RSI at ${tech.rsi.toFixed(1)} — neutral momentum`);
+    }
+
+    // 3. Momentum
+    if (tech.momentum > 0) {
+        buyScore += 1;
+        reasons.push(`10-day momentum is positive (+$${fmt(Math.abs(tech.momentum))}) — sustained buying pressure`);
+    } else if (tech.momentum < 0) {
+        sellScore += 1;
+        reasons.push(`10-day momentum is negative (-$${fmt(Math.abs(tech.momentum))}) — sustained selling pressure`);
+    }
+
+    // 4. Today's move
+    if (change > 0) {
+        buyScore += 1;
+        reasons.push(`Up $${fmt(change)} today — positive session`);
+    } else if (change < 0) {
+        sellScore += 1;
+        reasons.push(`Down $${fmt(Math.abs(change))} today — negative session`);
+    }
+
+    // Final
+    let type = 'HOLD';
+    if (buyScore > sellScore + 1) type = 'BUY';
+    else if (sellScore > buyScore + 1) type = 'SELL';
+
+    const total = buyScore + sellScore;
+    const confidence = total > 0 ? Math.round((Math.max(buyScore, sellScore) / total) * 100) : 50;
+
+    return { type, confidence, reasons };
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────
+function fmt(n)    { return n != null ? Number(n).toFixed(2) : 'N/A'; }
+function fmtVol(v) {
+    if (v == null) return 'N/A';
+    if (v >= 1e9) return (v/1e9).toFixed(2) + 'B';
+    if (v >= 1e6) return (v/1e6).toFixed(2) + 'M';
+    return v.toLocaleString();
+}
+function fmtCap(v) {
+    if (v == null) return 'N/A';
+    if (v >= 1e12) return '$' + (v/1e12).toFixed(2) + 'T';
+    if (v >= 1e9)  return '$' + (v/1e9).toFixed(2) + 'B';
+    if (v >= 1e6)  return '$' + (v/1e6).toFixed(2) + 'M';
+    return '$' + v.toLocaleString();
+}
+function setOutput(html) { document.getElementById('output').innerHTML = html; }
+
+// ─── NAV SHADOW ───────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+    document.querySelector('nav').style.boxShadow = window.scrollY > 50 ? '0 2px 20px rgba(0,0,0,0.1)' : 'none';
+});
+
+// Enter key
+document.getElementById('stockInput').addEventListener('keypress', e => { if (e.key === 'Enter') run(); });
+</script>
+</body>
+</html>
 </body>
 </html>
